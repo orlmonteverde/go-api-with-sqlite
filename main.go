@@ -51,11 +51,13 @@ func GetNotesHandler(w http.ResponseWriter, r *http.Request) {
 	notes, err := n.GetAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
+		return
 	}
 	// Conviertiendo el slice de Note a formato JSON, retorna un []byte
 	j, err := json.Marshal(notes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 	// Escribiendo el código de respuesta.
 	w.WriteHeader(http.StatusOK)
@@ -73,11 +75,13 @@ func CreateNotesHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&note)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 	// Creamos la nueva nota gracias al método Create.
 	err = note.Create()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -89,11 +93,13 @@ func UpdateNotesHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&note)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 	// Actualizamos la nota correspondiente.
 	err = note.Update()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -106,11 +112,13 @@ func DeleteNotesHandler(w http.ResponseWriter, r *http.Request) {
 	// Verificamos que no esté vacío.
 	if idStr == "" {
 		http.Error(w, "Query id es requerido", http.StatusBadRequest)
+		return
 	}
 	// Convertimos el valor obtenido del query a un int, de ser posible.
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "Query id debe ser un número", http.StatusBadRequest)
+		return
 	}
 
 	var note Note
@@ -118,6 +126,7 @@ func DeleteNotesHandler(w http.ResponseWriter, r *http.Request) {
 	err = note.Delete(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -139,5 +148,6 @@ func NotesHandler(w http.ResponseWriter, r *http.Request) {
 		// Caso por defecto en caso de que se realice una petición con un
 		// método deferente a los esperados.
 		http.Error(w, "Metodo no permitido", http.StatusBadRequest)
+		return
 	}
 }
